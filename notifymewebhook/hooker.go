@@ -14,6 +14,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+
 func GetToken() (string, string, error) {
 	request, err := createRequest()
 	if err != nil {
@@ -32,8 +33,7 @@ func GetToken() (string, string, error) {
 
 	data, err := convertJSON(response.Body)
 	if err != nil {
-		err.Error()
-	}
+		return "","", err	}
 
 	return data.AccessToken, data.TokenType, nil
 }
