@@ -11,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var previousTotalAlbums int64
+
 func main() {
 	route := gin.Default()
 	route.GET("/newalbumavailable/:artistid", start)
@@ -31,6 +33,7 @@ func start(c *gin.Context) {
 
 // http://localhost:8080/newalbumavailable/0Riv2KnFcLZA3JSVryRg4y
 // https://developer.spotify.com/documentation/web-api/reference/get-an-artists-albums
+
 func verifyNewAlbum(token string, bear string, artistid string) {
 	client := http.Client{}
 	request := createRequest(token, bear, artistid)
@@ -40,7 +43,6 @@ func verifyNewAlbum(token string, bear string, artistid string) {
 		fmt.Println(err.Error())
 	}
 	defer response.Body.Close()
-
 	if response.StatusCode != 200 {
 		fmt.Println(fmt.Errorf("Request failed: %w" + response.Status))
 	}
@@ -50,7 +52,11 @@ func verifyNewAlbum(token string, bear string, artistid string) {
 		fmt.Println(err.Error())
 	}
 
-	fmt.Println(data)
+	if data.Total > previousTotalAlbums {
+		fmt.Println("New album available", data.Total, previousTotalAlbums)
+	}
+
+	previousTotalAlbums = data.Total
 }
 
 func createRequest(token string, bear string, artistid string) *http.Request {
