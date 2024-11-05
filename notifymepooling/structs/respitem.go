@@ -4,7 +4,7 @@ type Item struct {
 	AlbumType            AlbumGroup           `json:"album_type"`
 	TotalTracks          int64                `json:"total_tracks"`
 	IsPlayable           bool                 `json:"is_playable"`
-	Href                 string               `json:"href"`
+	ExternalUrl 		 ExternalUrls         `json:"external_urls"`
 	ID                   string               `json:"id"`
 	Images               []Image              `json:"images"`
 	Name                 string               `json:"name"`

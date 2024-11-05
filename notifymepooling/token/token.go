@@ -1,7 +1,7 @@
 package token
 
 import (
-	"NotifyMe/notifymewebhook/structs"
+	"NotifyMe/notifymepooling/structs"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -56,7 +56,7 @@ func convertJSON(body io.ReadCloser) (structs.RespToken, error) {
 
 func getClientVariables() (string, string, error) {
 	// gotoenv starta junto ao main.
-	err := godotenv.Load("../notifymewebhook/.env")
+	err := godotenv.Load("../.env")
 	if err != nil {
 		return "", "", fmt.Errorf(".env file not found. %w", err)
 	}
