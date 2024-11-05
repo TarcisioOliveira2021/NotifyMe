@@ -16,12 +16,11 @@ import (
 
 func main() {
 	route := gin.Default()
-	route.POST("/notification", generateEmail)
+	route.POST("/notification", generateEmailNotification)
 	route.Run()
 }
 
-func generateEmail(c *gin.Context) {
-
+func generateEmailNotification(c *gin.Context) {
 	//Leitura do body
 	requestBody, err := io.ReadAll(c.Request.Body)
 	if err != nil {
@@ -46,7 +45,7 @@ func generateEmail(c *gin.Context) {
 	albumName := data.Name
 	albumUrl := data.ExternalUrl.Spotify
 	tracksNumber := strconv.FormatInt(data.TotalTracks, 10)
-	
+
 	listItems := ""
 	for _, artist := range data.Artists {
 		listItems += fmt.Sprintf(`<p>• <a href="%s"> <strong>%s</strong> </a> - Type: %s</p>`, artist.ExternalUrls.Spotify, artist.Name, strings.ToUpper(artist.Type))
