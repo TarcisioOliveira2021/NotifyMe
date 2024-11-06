@@ -2,16 +2,16 @@ package main
 
 import (
 	"NotifyMe/notifymepooling/structs"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 
-	"gopkg.in/gomail.v2"
-
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"gopkg.in/gomail.v2"
 )
 
 func main() {
@@ -21,7 +21,17 @@ func main() {
 }
 
 func generateEmailNotification(c *gin.Context) {
-	//Leitura do body
+
+	emailTo, emailHost, emailPort, emailUsername, emailPassword := loadEnviromentVariables()
+	data := deserializeRequestJSON(c)
+	emailMessage := createEmailMessage(data, emailTo, emailUsername)
+	emailPortConv := covertStringToInt(emailPort)
+	emailSender := createEmailSender(emailHost, emailPortConv, emailUsername, emailPassword)
+
+	sendEmail(emailMessage, emailSender)
+}
+
+func deserializeRequestJSON(c *gin.Context) structs.Item {
 	requestBody, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -29,16 +39,19 @@ func generateEmailNotification(c *gin.Context) {
 	defer c.Request.Body.Close()
 	data := structs.Item{}
 
-	//Transformação em json
 	err = json.Unmarshal(requestBody, &data)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	//Geração do email
+	return data
+}
+
+func createEmailMessage(data structs.Item, emailTo string, emailFrom string) *gomail.Message {
+
 	message := gomail.NewMessage()
-	message.SetHeader("From", "notifymeBot@sandbox.com")
-	message.SetHeader("To", "tarcisio.zark.veloso@gmail.com")
+	message.SetHeader("To", emailTo)
+	message.SetHeader("From", emailFrom)
 	message.SetHeader("Subject", "New album from "+data.Artists[0].Name+" avaialble in Spotify !")
 
 	albumImgUrl := data.Images[1].URL //0=> 640x640 1=>300x300 2=>64x64
@@ -65,14 +78,43 @@ func generateEmailNotification(c *gin.Context) {
 
 	message.SetBody("text/html", htmlString)
 
-	sender := gomail.NewDialer("sandbox.smtp.mailtrap.io", 587, "6bf7de91759ec9", "cf8c990571cc51")
-	sender.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	return message
+}
 
-	//Envio
-	err = sender.DialAndSend(message)
+func createEmailSender(emailHost string, emailPort int, emailUsername string, emailPassword string) *gomail.Dialer {
+	sender := gomail.NewDialer(emailHost, emailPort, emailUsername, emailPassword)
+	// sender.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+
+	return sender
+}
+
+func loadEnviromentVariables() (string, string, string, string, string) {
+	err := godotenv.Load("../.env")
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(".env file not found", err.Error())
 	}
 
-	fmt.Println("Email, sended!")
+	emailTo := os.Getenv("EMAIL_TO")
+	emailHost := os.Getenv("EMAIL_HOST")
+	emailPort := os.Getenv("EMAIL_PORT")
+	emailUsername := os.Getenv("EMAIL_USERNAME")
+	emailPassword := os.Getenv("EMAIL_PASSWORD")
+
+	return emailTo, emailHost, emailPort, emailUsername, emailPassword
+}
+
+func covertStringToInt(port string) int {
+	portConv, err := strconv.Atoi(port)
+	if err != nil {
+		panic(err)
+	}
+
+	return portConv
+}
+
+func sendEmail(message *gomail.Message, dialer *gomail.Dialer) {
+	err := dialer.DialAndSend(message)
+	if err != nil {
+		panic(err)
+	}
 }
