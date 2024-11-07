@@ -9,12 +9,12 @@ Aplicação que envia notificações por email sobre o lançamento de novos álb
 4- Para descobrir o ID do artista basta abrir a página dele no spotify e pegar o código no path da url após o `/artist/`, por exemplo: Nessa URL: https://open.spotify.com/intl-pt/artist/0Riv2KnFcLZA3JSVryRg4y, o código do artista é: `0Riv2KnFcLZA3JSVryRg4y` 
 
 ### Para rodar o projeto
-    - Basta clonar o projeto
-        - Para rodar local: (necessário ter o Go instalado na máquina)
-            - Executar o comando `go mod tidy` em `NotifyMe/` (Vai baixar as dependências necessárias) 
-            - É necessário rodar primeiro o pacote `./app` via `go run main.go`, depois executar o pacote `notifymepooling` usando o `go run main.go`
+- Basta clonar o projeto
+    - Para rodar local: (necessário ter o Go instalado na máquina)
+        - Executar o comando `go mod tidy` em `NotifyMe/` (Vai baixar as dependências necessárias) 
+        - É necessário rodar primeiro o pacote `./app` via `go run main.go`, depois executar o pacote `notifymepooling` usando o `go run main.go`
 
-        - Caso tenha o docker basta rodar `docker-compose up` em `NotifyMe/'
+    - Caso tenha o docker basta rodar `docker-compose up` em `NotifyMe/'
 
 ### Estrutura do arquivo .env
 - Deve ser colocado na raiz do projeto.
