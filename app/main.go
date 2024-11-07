@@ -22,9 +22,9 @@ func main() {
 
 func generateEmailNotification(c *gin.Context) {
 
-	emailTo, emailHost, emailPort, emailUsername, emailPassword := loadEnviromentVariables()
+	emailTo, emailHost, emailPort, emailUsername, emailPassword, emailFrom := loadEnviromentVariables()
 	data := deserializeRequestJSON(c)
-	emailMessage := createEmailMessage(data, emailTo, emailUsername)
+	emailMessage := createEmailMessage(data, emailTo, emailFrom)
 	emailPortConv := covertStringToInt(emailPort)
 	emailSender := createEmailSender(emailHost, emailPortConv, emailUsername, emailPassword)
 
@@ -83,24 +83,23 @@ func createEmailMessage(data structs.Item, emailTo string, emailFrom string) *go
 
 func createEmailSender(emailHost string, emailPort int, emailUsername string, emailPassword string) *gomail.Dialer {
 	sender := gomail.NewDialer(emailHost, emailPort, emailUsername, emailPassword)
-	// sender.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-
 	return sender
 }
 
-func loadEnviromentVariables() (string, string, string, string, string) {
+func loadEnviromentVariables() (string, string, string, string, string, string) {
 	err := godotenv.Load("../.env")
 	if err != nil {
 		fmt.Println(".env file not found", err.Error())
 	}
 
 	emailTo := os.Getenv("EMAIL_TO")
+	emailFrom := os.Getenv("EMAIL_FROM")
 	emailHost := os.Getenv("EMAIL_HOST")
 	emailPort := os.Getenv("EMAIL_PORT")
 	emailUsername := os.Getenv("EMAIL_USERNAME")
 	emailPassword := os.Getenv("EMAIL_PASSWORD")
 
-	return emailTo, emailHost, emailPort, emailUsername, emailPassword
+	return emailTo, emailHost, emailPort, emailUsername, emailPassword, emailFrom
 }
 
 func covertStringToInt(port string) int {

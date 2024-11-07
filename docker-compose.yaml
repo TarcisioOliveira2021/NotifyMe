@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+        notifymepooling-app:
+          build:
+            context: .
+            dockerfile: ./notifymepooling/Dockerfile
+          image: notifymepooling
+          depends_on:
+            - notifyme-app
+
+        notifyme-app:
+          build:
+            context: .
+            dockerfile: ./app/Dockerfile
+          image: notifymeapp
+          ports:
+            - 8080:8080    
+
+
+              
+        

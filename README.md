@@ -1,15 +1,44 @@
 # NotifyMe
-Aplicação de notificação de novos lançamentos de álbuns no spotify
+Aplicação que envia notificações por email sobre o lançamento de novos álbuns de um artista no Spotify, com uma verificação diária.
 
-- Refinamento de email : https://github.com/emailmonday/Cerberus/tree/main.
-- Lembrar de mencionar sobre habilitar o appPassword na conta do google.
-- API MAIL: https://api-docs.mailtrap.io/docs/mailtrap-api-docs/67f1d70aeb62c-send-email-including-templates
+### Observações
+1- Caso tenha escolhido o servidor do google, precisa habilitar o appPassword na conta do google. (Outros serviços podem ter sua própria necessidade) essas infos vão ser necessárias para preencehr o `EMAIL_USERNAME` e `EMAIL_PASSWORD`.
 
-COMANDOS DOCKER
+2- Caso queira testar o envio do email em um ambiente de testes, pode usar o serviço do Mailtrap (https://mailtrap.io/)
+3- É necessário criar uma conta no Spotify dev (https://developer.spotify.com/) para usar a api, é adinicionar no `.env` o `CLIENT_ID` e `CLIENT_SECRET` informados no Dashboard.
+4- Para descobrir o ID do artista basta abrir a página dele no spotify e pegar o código no path da url após o `/artist/`, por exemplo: Nessa URL: https://open.spotify.com/intl-pt/artist/0Riv2KnFcLZA3JSVryRg4y, o código do artista é: `0Riv2KnFcLZA3JSVryRg4y` 
 
-( Em /NotifyMe)
-- docker network create goapp
-- docker build -f app/Dockerfile -t notifyme-app . 
-- docker build -f notifymepooling/Dockerfile -t notifyme-poolingapp .
-- docker run --name notifyme-app --network goapp -p 8080:8080 -it notifyme-app 
-- docker run --name notifyme-poolingapp --network goapp -it notifyme-poolingapp
+### Para rodar o projeto
+    - Basta clonar o projeto
+        - Para rodar local: (necessário ter o Go instalado na máquina)
+            - Executar o comando `go mod tidy` em `NotifyMe/` (Vai baixar as dependências necessárias) 
+            - É necessário rodar primeiro o pacote `./app` via `go run main.go`, depois executar o pacote `notifymepooling` usando o `go run main.go`
+
+        - Caso tenha o docker basta rodar `docker-compose up` em `NotifyMe/'
+
+### Estrutura do arquivo .env
+- Deve ser colocado na raiz do projeto.
+    `CLIENT_ID=XPTO`
+
+    `CLIENT_SECRET=XPTO`
+
+    `ARTIST_ID=XPTO`
+
+    `API_URL=http://localhost:8080/notification`
+
+    `EMAIL_TO=`
+
+    `EMAIL_FROM=`
+
+    `EMAIL_HOST=`
+
+    `EMAIL_PORT=`
+
+    `EMAIL_USERNAME=`                               
+
+    `EMAIL_PASSWORD=`
+
+
+### Roadmap para futuras implementações
+- Refinamento do emailBody usando os templates: https://github.com/emailmonday/Cerberus/tree/main.
+- Permitir monitorar múltiplos artistas

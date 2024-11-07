@@ -16,27 +16,32 @@ import (
 var previousTotalAlbums int64
 
 func main() {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		fmt.Println(".env file not found", err.Error())
-	}
-
-	artistid := os.Getenv("ARTIST_ID")
-
+	artistid := loadEnviromentVariables()
+	
 	go func() {
 		for {
 			token, bear := token.GetToken()
 			newAlbum := verifyNewAlbum(token, bear, artistid)
 
-			// if newAlbum.TotalTracks > 0{
-			// 	notifyMyApp(newAlbum)
-			// }
+			if newAlbum.TotalTracks > 0{
+				notifyMyApp(newAlbum)
+			}
 
 			notifyMyApp(newAlbum)
 			time.Sleep(24 * time.Hour)
 		}
 	}()
 	select {}
+}
+
+func loadEnviromentVariables() (string){
+
+	err := godotenv.Load("../.env")
+	if err != nil {
+		fmt.Println(".env file not found", err.Error())
+	}
+
+	return os.Getenv("ARTIST_ID")
 }
 
 func notifyMyApp(data structs.Item) {
@@ -49,8 +54,6 @@ func notifyMyApp(data structs.Item) {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println("JSON ENVIADO:", string(jObj))
 
 	request, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jObj))
 	if err != nil {
@@ -81,9 +84,9 @@ func verifyNewAlbum(token string, bear string, artistid string) structs.Item {
 		fmt.Println(err.Error())
 	}
 
-	// if data.Total == previousTotalAlbums || previousTotalAlbums == 0 {
-	// 	return structs.Item{}
-	// }
+	if data.Total == previousTotalAlbums || previousTotalAlbums == 0 {
+		return structs.Item{}
+	}
 
 	previousTotalAlbums = data.Total
 	return data.Items[0]
