@@ -18,6 +18,7 @@ Aplicação que envia notificações por email sobre o lançamento de novos álb
 
 ### Estrutura do arquivo .env
 - Deve ser colocado na raiz do projeto.
+
     `CLIENT_ID=XPTO`
 
     `CLIENT_SECRET=XPTO`
