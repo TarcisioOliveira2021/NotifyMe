@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+
 	"github.com/joho/godotenv"
 )
 
@@ -17,13 +18,13 @@ var previousTotalAlbums int64
 
 func main() {
 	artistid := loadEnviromentVariables()
-	
+
 	go func() {
 		for {
 			token, bear := token.GetToken()
 			newAlbum := verifyNewAlbum(token, bear, artistid)
 
-			if newAlbum.TotalTracks > 0{
+			if newAlbum.TotalTracks > 0 {
 				notifyMyApp(newAlbum)
 			}
 
@@ -34,7 +35,7 @@ func main() {
 	select {}
 }
 
-func loadEnviromentVariables() (string){
+func loadEnviromentVariables() string {
 
 	err := godotenv.Load("../.env")
 	if err != nil {
@@ -84,7 +85,7 @@ func verifyNewAlbum(token string, bear string, artistid string) structs.Item {
 		fmt.Println(err.Error())
 	}
 
-	if data.Total == previousTotalAlbums || previousTotalAlbums == 0 {
+	if data.Total == previousTotalAlbums {
 		return structs.Item{}
 	}
 
@@ -94,6 +95,7 @@ func verifyNewAlbum(token string, bear string, artistid string) structs.Item {
 
 func createRequest(token string, bear string, artistid string) *http.Request {
 	url := "https://api.spotify.com/v1/artists/" + artistid + "/albums?market=BR"
+
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)
@@ -110,7 +112,7 @@ func convertJSON(body io.ReadCloser) (structs.Response, error) {
 	if err != nil {
 		return data, err
 	}
-	
+
 	err = json.Unmarshal(read, &data)
 	if err != nil {
 		return data, err
